@@ -1,3 +1,5 @@
+## Havn't added this in yet....for future use
+
 class ComponentManager:
     def __init__(self, request):
         self.request = request

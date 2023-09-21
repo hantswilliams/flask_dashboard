@@ -29,8 +29,6 @@ class InputDropdown:
         return render_template_string(template, name=self.name, label=self.label, values=self.values, selected_value=self.selected_value)
 
 
-
-
 class TextInput:
     def __init__(self, name, label, default_value=""):
         self.name = name

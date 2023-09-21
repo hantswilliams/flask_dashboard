@@ -1,21 +1,11 @@
 from flask import Flask, render_template_string, request
-from faker import Faker
 import pandas as pd
 
 from flask_dashboard import get_template
 from flask_dashboard.components.inputs import InputDropdown, TextInput
 from flask_dashboard.components.outputs import OutputText, OutputTable, OutputImage
 
-
-fake = Faker()
-product_list = ['Apple', 'Banana', 'Cherry', 'Date', 'Fig', 'Grape']
-category_list = ['Fruit', 'Vegetable', 'Dairy', 'Meat', 'Beverage', 'Snack']
-df = pd.DataFrame({
-    'Product': [fake.word(ext_word_list=product_list) for _ in range(100)],
-    'Category': [fake.word(ext_word_list=category_list) for _ in range(100)],
-    'Costs': [fake.pydecimal(left_digits=2, right_digits=2, positive=True) for _ in range(100)],
-})
-
+from fake_data.fake_df import fake_df as df
 
 app = Flask(__name__)
 
