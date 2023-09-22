@@ -2,7 +2,60 @@
 
 *About*: Inspired by Shiny and Streamlit, a flask focused python library to help assist with fast dashboarding. While Streamlit and Shiny are highly opinioned, this approach brings the dashboarding functionality (limited right now) to your flask environment, allowing you the freedom to further create and curate the application as you please. 
 
-I was inspired by Shiny, where they break things apart by inputs and server code. Based on this approach, I thought the following would make sense to begin: (1) input section, (2) normal python code, e.g., server related functions, and then (3) is the output rendering. 
+---
+
+## Component Manager
+
+The heart of the flask dashboarding library lies in the `ComponentManager`. It serves as a central coordinator for managing both input and output components, ensuring that everything is orchestrated in a seamless manner. Let's dive deeper:
+
+### Role of the Component Manager:
+
+1. **Managing State**: The `ComponentManager` retains the state of all registered components. This allows for the preservation of user inputs, even between page refreshes, enhancing the user experience.
+
+2. **Input Handling**: Every input, whether it be a dropdown, textbox, or a slider, is registered and managed by the `ComponentManager`. This registration aids in the collection of user input data, making it straightforward to access and process.
+
+3. **Output Rendering**: After processing the data, you can register output components that dictate how the processed data should be displayed. Whether you want to show a graph, a table, or just some text, the `ComponentManager` can handle it. It ensures that the outputs are rendered in the order they're registered.
+
+4. **HTML Integration**: Instead of manually curating HTML templates, the `ComponentManager` integrates with pre-defined templates. The registered input and output components are automatically injected into these templates, allowing for a dynamic and adaptive UI experience.
+
+### How to Use the Component Manager:
+
+It's quite simple. At the beginning of your endpoint function:
+
+1. **Initialization**: Start by initializing the `ComponentManager` with the current request.
+
+    ```python
+    manager = ComponentManager(request)
+    ```
+
+2. **Input Registration**: Create your inputs, encapsulate them into `FormGroups` if necessary, and then register these inputs with the manager.
+
+    ```python
+    input2_dropdown = InputDropdown(name='hospital_selection', label='Select a hospital:', values=(df, 'Hospital Name'))
+    manager.register_input(input2_dropdown)
+    ```
+
+3. **Output Registration**: After processing your data, decide how you want to display it. Create output components and register them with the manager.
+
+    ```python
+    manager.register_output(OutputText(f"The median net income is {avg_net_income}."))
+    ```
+
+4. **Rendering**: Finally, use the manager's rendering methods to get the HTML representation of the components and inject them into your chosen template.
+
+    ```python
+    return render_template_string(
+        get_template('base.html'),
+        form_groups=manager.render_form_groups(), 
+        output_components=manager.render_outputs()
+    )
+    ```
+
+By using the `ComponentManager`, you can ensure a structured and streamlined approach to dashboarding, all while retaining the flexibility and customizability that Flask offers.
+
+---
+
+# Installation and Walk-through
 
 ## Installation 
 
@@ -12,7 +65,7 @@ pip install ???_flask_dashboard_???
 
 ## How to: 
 
-1. First load in the library at the top of you app file. In a basic example, it might look like this:
+1. **LOAD LIBRARY**: First load in the library at the top of you app file. In a basic example, it might look like this:
 ```python
 from flask_dashboard import get_template
 from flask_dashboard.components.inputs import InputDropdown
