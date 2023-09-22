@@ -25,7 +25,7 @@ def index():
 
     # Step 2: Registering and capturing inputs for this request
     # We can separate these into distinct groups, so here is the first group: 
-    hospital_form_group = FormGroup(action_url='/')
+    hospital_form_group = FormGroup(action_url='/', markdown="""### Hospital Selection""", markdown_position='top')
     input2_dropdown = InputDropdown(name='hospital_selection', label='Select a hospital:', values=(df, 'Hospital Name'))
     hospital_form_group.add_input(input2_dropdown)
     manager.register_input(input2_dropdown)
@@ -33,14 +33,14 @@ def index():
 
     # Step 2b: Lets now create a second group of inputs
     # This one will have a dropdown based on the Number of Beds, where we have a list of <100, or >100
-    hospital_form_group2 = FormGroup(action_url='/')
+    hospital_form_group2 = FormGroup(action_url='/', markdown="""### Hospital Bed Selection""", markdown_position='top')
     input2_dropdown2 = InputDropdown(name='bed_selection', label='Select a number of beds:', values=['<100', '>100'])
     hospital_form_group2.add_input(input2_dropdown2)
     manager.register_input(input2_dropdown2)
     manager.register_form_group(hospital_form_group2)
 
     # Step 2c: Lets create a dropdown that can filter if the net income is positive or negative
-    hospital_form_group3 = FormGroup(action_url='/')
+    hospital_form_group3 = FormGroup(action_url='/', markdown="""### Hospital Net Income Selection""", markdown_position='top')
     input2_dropdown3 = InputDropdown(name='net_income_selection', label='Select a net income:', values=['Positive', 'Negative'])
     hospital_form_group3.add_input(input2_dropdown3)
     manager.register_input(input2_dropdown3)
@@ -49,15 +49,12 @@ def index():
     ################################################################################################
     # Step 3: 
     ### Do the normal python processing stuff of your data: 
-    output_df, avg_net_income, diff_net_income, plt = process_data(df, [input2_dropdown.value, 
-                                                                        input2_dropdown2.value, input2_dropdown3.value])
+    output_df, plt = process_data(df, [input2_dropdown.value, input2_dropdown2.value, input2_dropdown3.value])
     ################################################################################################
 
     ################################################################################################
     # Step 4: Register output components to be rendered
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
-    manager.register_output(OutputText(f"The median net income across these {len(df)} hospitals is {avg_net_income}."))
-    manager.register_output(OutputText(f"The difference between the selected hospital ({input2_dropdown.value.lower()}) and the median net income across these {len(df)} hospitals is {diff_net_income}."))
     manager.register_output(OutputMarkdown("""---"""))
     manager.register_output(OutputChart_Matplotlib(plt))
     manager.register_output(OutputMarkdown("""### Hospital Financial Detail Data"""))

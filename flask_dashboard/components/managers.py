@@ -3,13 +3,23 @@
 # components/managers.py
 
 from flask import render_template_string
+from markdown import markdown
 
 
 FORM_GROUP_TEMPLATE = """
 <form method="post" action="{{ action_url }}">
+    {% if markdown and markdown_position == 'top' %}
+        <div class="markdown-body">{{ markdown|safe }}</div>
+    {% endif %}
+    
     {% for input_component in inputs %}
         <div class="mb-4">{{ input_component|safe }}</div>
     {% endfor %}
+    
+    {% if markdown and markdown_position == 'bottom' %}
+        <div class="markdown-body">{{ markdown|safe }}</div>
+    {% endif %}
+    
     <button type="submit" class="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Submit</button>
 </form>
 """
@@ -78,12 +88,17 @@ class ComponentManager:
         self.outputs.append(output_component)
         return output_component
     
-    # New method to render form groups
     def render_form_groups(self):
         rendered_form_groups = []
         for form_group in self.form_groups:
             inputs = [input_component.render() for input_component in form_group.inputs]
-            rendered_form_group = render_template_string(FORM_GROUP_TEMPLATE, action_url=form_group.action_url, inputs=inputs)
+            rendered_form_group = render_template_string(
+                FORM_GROUP_TEMPLATE, 
+                action_url=form_group.action_url, 
+                inputs=inputs,
+                markdown=markdown(form_group.markdown),
+                markdown_position=form_group.markdown_position
+            )
             rendered_form_groups.append(rendered_form_group)
         return rendered_form_groups
     
@@ -100,9 +115,16 @@ class ComponentManager:
 
 
 class FormGroup:
-    def __init__(self, action_url='/'):
+    def __init__(self, action_url='/', markdown=None, markdown_position='bottom'):
+        """
+        :param action_url: URL to which the form data should be posted.
+        :param markdown: Optional markdown content to be displayed.
+        :param markdown_position: Position where markdown should be rendered ('top' or 'bottom').
+        """
         self.action_url = action_url
         self.inputs = []
+        self.markdown = markdown
+        self.markdown_position = markdown_position
 
     def add_input(self, input_component):
         print(f"Adding input: {input_component.name}")  # Debugging statement
