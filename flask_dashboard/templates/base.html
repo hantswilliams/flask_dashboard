@@ -8,10 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 h-screen font-sans">
-    <div class="container mx-auto h-full flex">
+    <div class="h-full flex mx-auto">
+
         <!-- Input Panel (Left Side) -->
         <div class="w-1/4 bg-white p-4 shadow-lg">
-            <h2 class="text-xl mb-4">Input</h2>
+            <h2 class="text-xl mb-4">Input Panel:</h2>
             
             <form method="post" action="/">
                 {% for input_component in input_components %}
@@ -23,7 +24,7 @@
     
         <!-- Output Panel (Center) -->
         <div class="w-3/4 ml-6">
-            <h2 class="text-xl mb-4">Output</h2>
+            <h2 class="text-xl mb-4"></h2>
             {% for output_component in output_components %}
                 <div class="mb-4">{{ output_component|safe }}</div>
             {% endfor %}
