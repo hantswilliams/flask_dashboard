@@ -29,7 +29,6 @@ def index():
     manager.register_input(input2_dropdown)
     manager.register_form_group(hospital_form_group)
 
-
     # Step 2b: Lets now create a second group of inputs
     # This one will have a dropdown based on the Number of Beds, where we have a list of <100, or >100
     hospital_form_group2 = FormGroup(action_url='/')
@@ -44,6 +43,16 @@ def index():
     hospital_form_group3.add_input(input2_dropdown3)
     manager.register_input(input2_dropdown3)
     manager.register_form_group(hospital_form_group3)
+    
+    
+    
+    
+
+    
+    
+    
+    
+
     
     
     
@@ -73,7 +82,8 @@ def index():
 
 
     ## Calculate median net income for all hospitals
-    avg_net_income_num = df['Net Income'].median()
+    df_median = df.copy()
+    avg_net_income_num = df_median['Net Income'].median()
     avg_net_income = "{:,}".format(avg_net_income_num).split('.')[0]
 
     ## Calculate difference between selected hospital and average net income
@@ -95,9 +105,31 @@ def index():
     plt.ylabel('Net Income')
     plt.tight_layout()
 
+    ## Modify the output_df to include commas in the numbers: Number of Beds, Outpatient Revenue, Inpatient Revenue, Net Income, Medicaid Charges
+    output_df['Net Income'] = output_df['Net Income'].apply(lambda x: "{:,}".format(x).split('.')[0])
+    output_df['Number of Beds'] = output_df['Number of Beds'].apply(lambda x: "{:,}".format(x).split('.')[0])
+    output_df['Outpatient Revenue'] = output_df['Outpatient Revenue'].apply(lambda x: "{:,}".format(x).split('.')[0])
+    output_df['Inpatient Revenue'] = output_df['Inpatient Revenue'].apply(lambda x: "{:,}".format(x).split('.')[0])
+    output_df['Medicaid Charges'] = output_df['Medicaid Charges'].apply(lambda x: "{:,}".format(x).split('.')[0])
 
     ################################################################################################
 
+    
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+
+    
+    ################################################################################################
     # Step 4: Register output components to be rendered
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
     manager.register_output(OutputText(f"The median net income across these {len(df)} hospitals is {avg_net_income}."))
@@ -106,6 +138,9 @@ def index():
     manager.register_output(OutputChart_Matplotlib(plt))
     manager.register_output(OutputMarkdown("""### Hospital Financial Detail Data"""))
     manager.register_output(OutputTable_HTML(output_df.to_dict(orient='records')))
+    manager.register_output(OutputMarkdown("""<br /> <br /> """))
+
+    ################################################################################################
 
 
     # Step 5: Render the template with the inputs and outputs
