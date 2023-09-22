@@ -43,12 +43,14 @@ class InputDropdown(BaseInput):
     def render(self):
         print("....Rendering dropdown....") 
         template = '''
-        <label for="{{ name }}" class="block text-sm font-medium text-red-700">{{ label }}</label>
-        <select name="{{ name }}" class="">
-            {% for value in values %}
-                <option value="{{ value }}" {% if value == selected_value %}selected{% endif %}>{{ value }}</option>
-            {% endfor %}
-        </select>
+        <div class="overflow-hidden">
+            <label for="{{ name }}" class="overflow-hidden block text-sm font-medium text-red-700">{{ label }}</label>
+            <select name="{{ name }}" class="overflow-hidden">
+                {% for value in values %}
+                    <option value="{{ value }}" {% if value == selected_value %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
         '''
         return render_template_string(template, name=self.name, label=self.label, values=self.values, selected_value=self.selected_value)
 class TextInput(BaseInput):
