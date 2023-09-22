@@ -1,9 +1,9 @@
 # components/outputs.py
 
-from flask import render_template_string, send_file
+from flask import render_template_string
 import io
 import base64
-
+from markdown import markdown
 
 class OutputText:
     def __init__(self, content):
@@ -11,7 +11,7 @@ class OutputText:
 
     def render(self):
         template = '''
-        <div class="p-4 border rounded">
+        <div class="p-2 border rounded">
             {{ content }}
         </div>
         '''
@@ -85,3 +85,20 @@ class OutputImage:
         '''
         return render_template_string(template, src=self.src, alt=self.alt)
 
+
+class OutputMarkdown:
+    def __init__(self, markdown_content):
+        self.markdown_content = markdown_content
+
+    def render(self):
+        html_content = markdown(self.markdown_content)
+
+        print('Checking for conversion: ', html_content)
+        
+        template = '''
+        <div class="markdown-body">
+            {{ content|safe }}
+        </div>
+        '''
+        
+        return render_template_string(template, content=html_content)

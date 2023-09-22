@@ -11,17 +11,17 @@ class BaseInput:
         self.value = request.form.get(self.name, self.default_value)
 
 class InputDropdown(BaseInput):
-    def __init__(self, name, label, values, action_url="/", selected_value=None):
+    def __init__(self, name, label, values, action_url="/", selected_value="Select All"):
         # Initialize the base attributes
-        super().__init__(name, selected_value if selected_value is not None else "")
+        super().__init__(name, selected_value)
         
         self.label = label
         if isinstance(values, tuple) and len(values) == 2 and hasattr(values[0], 'loc'):
             # If values is a tuple and the first item is a DataFrame, extract unique values from the given column
-            self.values = values[0][values[1]].unique().tolist()
+            self.values = ["Select All"] + values[0][values[1]].unique().tolist()
         elif isinstance(values, list):
-            # If values is a list, use it directly
-            self.values = values
+            # If values is a list, add "Select All" at the beginning
+            self.values = ["Select All"] + values
         else:
             raise ValueError("Invalid values provided. It should be either a list or a tuple with DataFrame and column name.")
         
@@ -31,9 +31,9 @@ class InputDropdown(BaseInput):
     def capture(self, request):
         self.value = request.form.get(self.name)
         
-        if not self.value and self.values:
-            # If no value is captured and there are options available, default to the first option
-            self.value = self.values[0]
+        if not self.value:
+            # Default to the 'Select All' option
+            self.value = "Select All"
         
         # Update the selected_value to the captured value for rendering purposes
         self.selected_value = self.value
@@ -62,3 +62,4 @@ class TextInput(BaseInput):
         <input type="text" id="{{ name }}" name="{{ name }}" value="{{ default_value }}">
         '''
         return render_template_string(template, name=self.name, label=self.label, default_value=self.default_value)
+

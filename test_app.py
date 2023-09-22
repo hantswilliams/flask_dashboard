@@ -1,17 +1,19 @@
 from flask import Flask, render_template_string, request
 
 from flask_dashboard import get_template
-from flask_dashboard.components.inputs import InputDropdown, TextInput
-from flask_dashboard.components.outputs import OutputText, OutputChart_Matplotlib, OutputTable_HTML, OutputImage
+from flask_dashboard.components.inputs import InputDropdown
+from flask_dashboard.components.outputs import OutputText, OutputChart_Matplotlib, OutputTable_HTML, OutputImage, OutputMarkdown
 from flask_dashboard.components.managers import ComponentManager
 
-from fake_data.fake_df import fake_df as df
+import pandas as pd
 
 import matplotlib
 matplotlib.use('Agg') # required for local development and g-shell
 import matplotlib.pyplot as plt
 
 app = Flask(__name__)
+
+df = pd.read_csv('fake_data/ny_suffolk_nassau.csv')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -20,9 +22,19 @@ def index():
     manager = ComponentManager(request)
 
     # Step 2: Registering and capturing inputs for this request
-    manager.register_input(TextInput('input_freetext', 'Free text input example:', default_value=''))
-    input2_dropdown = manager.register_input(InputDropdown(name= 'product_selection', label = 'Select a product:', values = (df, 'Product'), action_url='/'))
-    input3_dropdown = manager.register_input(InputDropdown(name = 'descriptive_statistic', label = 'Select a statistic:', values = ['Mean', 'Median', 'Mode']))
+    # manager.register_input(TextInput('input_freetext', 'Free text input example:', default_value=''))
+    input2_dropdown = manager.register_input(InputDropdown(name= 'hospital_selection', label = 'Select a hospital:', values = (df, 'Hospital Name'), action_url='/'))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -32,28 +44,33 @@ def index():
 
     ############### NORMAL PYTHON CODE GOES HERE FOR DATA MANIPULATION/CREATION ###############
     # Step 3: Do any additional processing of the data based on the inputs
-    if input2_dropdown.value:
-        output_df = df[df['Product'] == input2_dropdown.value]
+    ## if a value is selected and it is not "Select All", filter the dataframe to only include the selected value
+    if input2_dropdown.value and input2_dropdown.value != 'Select All':
+        output_df = df[df['Hospital Name'] == input2_dropdown.value]
     else:
         output_df = df
 
-    # Based on the selected column [Product], calculate the mean, median, or mode of the selected column [Costs]
-    if input3_dropdown.value == 'Mean':
-        stat_output = output_df.groupby('Product').mean().reset_index()
-    elif input3_dropdown.value == 'Median':
-        stat_output = output_df.groupby('Product').median().reset_index()
-    elif input3_dropdown.value == 'Mode':
-        stat_output = output_df.groupby('Product').agg(lambda x:x.value_counts().index[0]).reset_index()
+    ## Calculate median net income for all hospitals
+    avg_net_income_num = df['Net Income'].median()
+    avg_net_income = "{:,}".format(avg_net_income_num).split('.')[0]
+
+    ## Calculate difference between selected hospital and average net income
+    if input2_dropdown.value:
+        diff_net_income = output_df['Net Income'].values[0] - avg_net_income_num
+        diff_net_income = "{:,}".format(diff_net_income).split('.')[0]
+    else:
+        diff_net_income = 0
 
     # Based on output_df, create a matplotlib chart, where the x-axis is the product and the y-axis is the cost, 
     # and the selected column [Product] is then highlighted in the chart with a different color
     plt.figure(figsize=(8, 6))
-    plt.bar(df['Product'], df['Costs'])
-    plt.bar(output_df['Product'], output_df['Costs'], color='red')
-    plt.xticks(rotation=45)
-    plt.title('Product Cost')
-    plt.xlabel('Product')
-    plt.ylabel('Cost')
+    plt.bar(df['Hospital Name'], df['Net Income'])
+    plt.bar(output_df['Hospital Name'], output_df['Net Income'], color='red')
+    plt.axhline(y=avg_net_income_num, color='green', linestyle='--', label=f'Median: ${avg_net_income}')
+    plt.xticks(rotation=90)
+    plt.title('Net Income')
+    plt.xlabel('Hospital Name')
+    plt.ylabel('Net Income')
     plt.tight_layout()
 
     ################################################################################################
@@ -65,10 +82,22 @@ def index():
 
 
 
+
+
+
+
+
+
+
+
+
     # Step 4: Register output components to be rendered
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
+    manager.register_output(OutputText(f"The median net income across these {len(df)} hospitals is {avg_net_income}."))
+    manager.register_output(OutputText(f"The difference between the selected hospital ({input2_dropdown.value.lower()}) and the median net income across these {len(df)} hospitals is {diff_net_income}."))
+    manager.register_output(OutputMarkdown("""---"""))
     manager.register_output(OutputChart_Matplotlib(plt))
-    manager.register_output(OutputText(f"The type of descriptive statistic selected: {input3_dropdown.value}, and the product selected: {input2_dropdown.value}. The {input3_dropdown.value} of the {input2_dropdown.value} is {stat_output['Costs'].values[0]}"))
+    manager.register_output(OutputMarkdown("""### Hospital Financial Detail Data"""))
     manager.register_output(OutputTable_HTML(output_df.to_dict(orient='records')))
 
 
