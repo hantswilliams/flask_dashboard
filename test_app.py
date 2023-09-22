@@ -3,7 +3,7 @@ from flask import Flask, render_template_string, request
 from flask_dashboard import get_template
 from flask_dashboard.components.inputs import InputDropdown
 from flask_dashboard.components.outputs import OutputText, OutputChart_Matplotlib, OutputTable_HTML, OutputImage, OutputMarkdown
-from flask_dashboard.components.managers import ComponentManager
+from flask_dashboard.components.managers import ComponentManager, FormGroup
 
 import pandas as pd
 
@@ -22,33 +22,55 @@ def index():
     manager = ComponentManager(request)
 
     # Step 2: Registering and capturing inputs for this request
-    # manager.register_input(TextInput('input_freetext', 'Free text input example:', default_value=''))
-    input2_dropdown = manager.register_input(InputDropdown(name= 'hospital_selection', label = 'Select a hospital:', values = (df, 'Hospital Name'), action_url='/'))
+    # We can separate these into distinct groups, so here is the first group: 
+    hospital_form_group = FormGroup(action_url='/')
+    input2_dropdown = InputDropdown(name='hospital_selection', label='Select a hospital:', values=(df, 'Hospital Name'))
+    hospital_form_group.add_input(input2_dropdown)
+    manager.register_input(input2_dropdown)
+    manager.register_form_group(hospital_form_group)
 
 
+    # Step 2b: Lets now create a second group of inputs
+    # This one will have a dropdown based on the Number of Beds, where we have a list of <100, or >100
+    hospital_form_group2 = FormGroup(action_url='/')
+    input2_dropdown2 = InputDropdown(name='bed_selection', label='Select a number of beds:', values=['<100', '>100'])
+    hospital_form_group2.add_input(input2_dropdown2)
+    manager.register_input(input2_dropdown2)
+    manager.register_form_group(hospital_form_group2)
 
+    # Step 2b: Lets create a dropdown that can filter if the net income is positive or negative
+    hospital_form_group3 = FormGroup(action_url='/')
+    input2_dropdown3 = InputDropdown(name='net_income_selection', label='Select a net income:', values=['Positive', 'Negative'])
+    hospital_form_group3.add_input(input2_dropdown3)
+    manager.register_input(input2_dropdown3)
+    manager.register_form_group(hospital_form_group3)
+    
+    
+    
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     ############### NORMAL PYTHON CODE GOES HERE FOR DATA MANIPULATION/CREATION ###############
     # Step 3: Do any additional processing of the data based on the inputs
     ## if a value is selected and it is not "Select All", filter the dataframe to only include the selected value
+
     if input2_dropdown.value and input2_dropdown.value != 'Select All':
         output_df = df[df['Hospital Name'] == input2_dropdown.value]
     else:
         output_df = df
+
+    if input2_dropdown2.value and input2_dropdown2.value != 'Select All':
+        if input2_dropdown2.value == '<100':
+            output_df = output_df[output_df['Number of Beds'] < 100]
+        else:
+            output_df = output_df[output_df['Number of Beds'] > 100]
+    
+    if input2_dropdown3.value and input2_dropdown3.value != 'Select All':
+        if input2_dropdown3.value == 'Positive':
+            output_df = output_df[output_df['Net Income'] > 0]
+        else:
+            output_df = output_df[output_df['Net Income'] < 0]
+
 
     ## Calculate median net income for all hospitals
     avg_net_income_num = df['Net Income'].median()
@@ -73,23 +95,8 @@ def index():
     plt.ylabel('Net Income')
     plt.tight_layout()
 
+
     ################################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     # Step 4: Register output components to be rendered
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
@@ -103,8 +110,8 @@ def index():
 
     # Step 5: Render the template with the inputs and outputs
     return render_template_string(
-        get_template('base.html'), # select a template that you want to render for this request page
-        input_components=manager.render_inputs(), 
+        get_template('base.html'),
+        form_groups=manager.render_form_groups(), 
         output_components=manager.render_outputs()
     )
 

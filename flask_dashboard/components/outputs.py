@@ -51,24 +51,26 @@ class OutputTable_HTML:
 
     def render(self):
         template = '''
-        <table class="min-w-full bg-white border rounded">
-            <thead>
-                <tr>
-                {% for header in data[0].keys() %}
-                    <th class="px-4 py-2">{{ header }}</th>
-                {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in data %}
+        <div class="bg-white">
+            <table class="min-w-full divide-y divide-gray-300">
+                <thead>
                     <tr>
-                        {% for value in row.values() %}
-                            <td class="border px-4 py-2">{{ value }}</td>
-                        {% endfor %}
+                    {% for header in data[0].keys() %}
+                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-grey-900">{{ header }}</th>
+                    {% endfor %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr>
+                            {% for value in row.values() %}
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         '''
         return render_template_string(template, data=self.data)
 

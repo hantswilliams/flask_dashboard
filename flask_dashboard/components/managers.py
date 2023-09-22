@@ -2,6 +2,20 @@
 
 # components/managers.py
 
+from flask import render_template_string
+
+
+FORM_GROUP_TEMPLATE = """
+<form method="post" action="{{ action_url }}">
+    {% for input_component in inputs %}
+        <div class="mb-4">{{ input_component|safe }}</div>
+    {% endfor %}
+    <button type="submit" class="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Submit</button>
+</form>
+"""
+
+
+
 class ComponentManager:
     def __init__(self, request):
         """
@@ -12,6 +26,7 @@ class ComponentManager:
         """
         self.request = request
         self.inputs = []
+        self.form_groups = []   # list to store registered form groups
         self.outputs = []
 
     def register_input(self, input_component):
@@ -27,6 +42,19 @@ class ComponentManager:
         input_component.capture(self.request)
         self.inputs.append(input_component)
         return input_component
+    
+    def register_form_group(self, form_group):
+        """
+        Register a form group and append it to the form_groups list.
+        
+        Args:
+        - form_group (FormGroupManager): The form group to register.
+
+        Returns:
+        - FormGroupManager: The registered form group.
+        """
+        self.form_groups.append(form_group)
+        return form_group
 
     def render_inputs(self):
         """
@@ -50,6 +78,15 @@ class ComponentManager:
         self.outputs.append(output_component)
         return output_component
     
+    # New method to render form groups
+    def render_form_groups(self):
+        rendered_form_groups = []
+        for form_group in self.form_groups:
+            inputs = [input_component.render() for input_component in form_group.inputs]
+            rendered_form_group = render_template_string(FORM_GROUP_TEMPLATE, action_url=form_group.action_url, inputs=inputs)
+            rendered_form_groups.append(rendered_form_group)
+        return rendered_form_groups
+    
     def render_outputs(self):
         """
         Render all the registered output components.
@@ -58,3 +95,15 @@ class ComponentManager:
         - list: List of rendered output components.
         """
         return [output_component.render() for output_component in self.outputs]
+    
+
+
+
+class FormGroup:
+    def __init__(self, action_url='/'):
+        self.action_url = action_url
+        self.inputs = []
+
+    def add_input(self, input_component):
+        print(f"Adding input: {input_component.name}")  # Debugging statement
+        self.inputs.append(input_component)

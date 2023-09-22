@@ -30,6 +30,8 @@ class InputDropdown(BaseInput):
 
     def capture(self, request):
         self.value = request.form.get(self.name)
+
+        print(f"Captured value for {self.name}: {self.value}")  # debugging print statement
         
         if not self.value:
             # Default to the 'Select All' option
@@ -39,16 +41,16 @@ class InputDropdown(BaseInput):
         self.selected_value = self.value
 
     def render(self):
+        print("....Rendering dropdown....") 
         template = '''
-        <label for="{{ name }}">{{ label }}</label>
-        <select name="{{ name }}">
-        {% for value in values %}
-            <option value="{{ value }}" {% if value == selected_value %}selected{% endif %}>{{ value }}</option>
-        {% endfor %}
+        <label for="{{ name }}" class="block text-sm font-medium text-red-700">{{ label }}</label>
+        <select name="{{ name }}" class="">
+            {% for value in values %}
+                <option value="{{ value }}" {% if value == selected_value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
         </select>
         '''
         return render_template_string(template, name=self.name, label=self.label, values=self.values, selected_value=self.selected_value)
-
 class TextInput(BaseInput):
     def __init__(self, name, label, default_value=""):
         # Initialize the base attributes

@@ -14,14 +14,14 @@
 
         <!-- Input Panel (Left Side) -->
         <div class="w-1/4 bg-white p-4 shadow-lg">
-            <h2 class="text-xl mb-4">Input Panel:</h2>
+            <h2 class="text-xl mb-4"></h2>
             
-            <form method="post" action="/">
-                {% for input_component in input_components %}
-                    <div class="mb-4">{{ input_component|safe }}</div>
-                {% endfor %}
-                <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
-            </form>
+            {% for form_group in form_groups %}
+                <div class="mb-4 border-b pb-4">
+                    {{ form_group|safe }}
+                </div>
+            {% endfor %}
+                    
         </div>
     
         <!-- Output Panel (Center) -->
