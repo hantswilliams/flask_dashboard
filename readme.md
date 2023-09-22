@@ -7,3 +7,11 @@
 ```bash
 pip install ???_flask_dashboard_???
 ```
+
+## To do: 
+- [x] Add initial input components
+- [x] Add initial output components
+- [x] Create at least one basic .html template for the dashboard view 
+- [ ] Incorporate statement system 
+- [ ] Incorporate loggin 
+- [ ] Incorporate user login / RBAC 
