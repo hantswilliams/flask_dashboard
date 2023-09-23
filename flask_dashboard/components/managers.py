@@ -8,20 +8,23 @@ from markdown import markdown
 
 FORM_GROUP_TEMPLATE = """
 <form method="post" action="{{ action_url }}">
-    {% if markdown and markdown_position == 'top' %}
-        <div class="markdown-body">{{ markdown|safe }}</div>
+    {% if markdown_top %}
+        <div class="markdown-body">{{ markdown_top|safe }}</div>
     {% endif %}
     
     {% for input_component in inputs %}
         <div class="mb-4">{{ input_component|safe }}</div>
     {% endfor %}
-    
-    {% if markdown and markdown_position == 'bottom' %}
-        <div class="markdown-body">{{ markdown|safe }}</div>
+
+    {% if markdown_bottom %}
+        <div class="markdown-body mb-2">{{ markdown_bottom|safe }}</div>
     {% endif %}
     
     <button type="submit" class="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Submit</button>
-</form>
+
+
+    
+    </form>
 """
 
 
@@ -96,8 +99,8 @@ class ComponentManager:
                 FORM_GROUP_TEMPLATE, 
                 action_url=form_group.action_url, 
                 inputs=inputs,
-                markdown=markdown(form_group.markdown),
-                markdown_position=form_group.markdown_position
+                markdown_top=markdown(form_group.markdown_top),
+                markdown_bottom=markdown(form_group.markdown_bottom)
             )
             rendered_form_groups.append(rendered_form_group)
         return rendered_form_groups
@@ -115,16 +118,16 @@ class ComponentManager:
 
 
 class FormGroup:
-    def __init__(self, action_url='/', markdown=None, markdown_position='bottom'):
+    def __init__(self, action_url='/', markdown_top=None, markdown_bottom=None):
         """
         :param action_url: URL to which the form data should be posted.
-        :param markdown: Optional markdown content to be displayed.
-        :param markdown_position: Position where markdown should be rendered ('top' or 'bottom').
+        :param markdown_top: Optional markdown content to be displayed at the top of the section.
+        :param markdown_bottom: Optional markdown content to be displayed at the bottom of the section.
         """
         self.action_url = action_url
         self.inputs = []
-        self.markdown = markdown
-        self.markdown_position = markdown_position
+        self.markdown_top = markdown_top
+        self.markdown_bottom = markdown_bottom
 
     def add_input(self, input_component):
         print(f"Adding input: {input_component.name}")  # Debugging statement

@@ -25,7 +25,7 @@ def index():
 
     # Step 2: Registering and capturing inputs for this request
     # We can separate these into distinct groups, so here is the first group: 
-    hospital_form_group = FormGroup(action_url='/', markdown="""### Hospital Selection""", markdown_position='top')
+    hospital_form_group = FormGroup(action_url='/', markdown_top="""### Hospital Selection""", markdown_bottom="""*Use this section to filter by a specific hospital.*""")
     input2_dropdown = InputDropdown(name='hospital_selection', label='Select a hospital:', values=(df, 'Hospital Name'))
     hospital_form_group.add_input(input2_dropdown)
     manager.register_input(input2_dropdown)
@@ -33,14 +33,17 @@ def index():
 
     # Step 2b: Lets now create a second group of inputs
     # This one will have a dropdown based on the Number of Beds, where we have a list of <100, or >100
-    hospital_form_group2 = FormGroup(action_url='/', markdown="""### Hospital Bed Selection""", markdown_position='top')
-    input2_dropdown2 = InputDropdown(name='bed_selection', label='Select a number of beds:', values=['<100', '>100'])
+    hospital_form_group2 = FormGroup(action_url='/', markdown_top="""### Hospital Bed Selection""", markdown_bottom="""*Use this section to filter by a number of beds.*""")
+    input2_dropdown2 = InputDropdown(name='bed_selection', label='Select a number of beds:', values=[
+        'hospital < 100', 
+        '100 >= hospital < 300', 
+        'hospital >= 300'])
     hospital_form_group2.add_input(input2_dropdown2)
     manager.register_input(input2_dropdown2)
     manager.register_form_group(hospital_form_group2)
 
     # Step 2c: Lets create a dropdown that can filter if the net income is positive or negative
-    hospital_form_group3 = FormGroup(action_url='/', markdown="""### Hospital Net Income Selection""", markdown_position='top')
+    hospital_form_group3 = FormGroup(action_url='/', markdown_top="""### Hospital Net Income Selection""", markdown_bottom="""*Use this section to filter by a net income.*""")
     input2_dropdown3 = InputDropdown(name='net_income_selection', label='Select a net income:', values=['Positive', 'Negative'])
     hospital_form_group3.add_input(input2_dropdown3)
     manager.register_input(input2_dropdown3)
@@ -49,14 +52,34 @@ def index():
     ################################################################################################
     # Step 3: 
     ### Do the normal python processing stuff of your data: 
-    output_df, plt = process_data(df, [input2_dropdown.value, input2_dropdown2.value, input2_dropdown3.value])
+    output_df, sum_stats_df, fig1 = process_data(df, [input2_dropdown.value, input2_dropdown2.value, input2_dropdown3.value])
     ################################################################################################
 
     ################################################################################################
     # Step 4: Register output components to be rendered
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
+    manager.register_output(OutputMarkdown("""# Suffolk and Nassau County Hospital Data: CMS 2019"""))
+    manager.register_output(OutputMarkdown("""The following data originates from [data.cms.gov](https://data.cms.gov/provider-compliance/cost-report/hospital-provider-cost-report),
+                                           and is a subset of the data for Suffolk and Nassau County. The data is from 2019 and is the most recent data available. 
+                                           This data is gathered from the hospital annual cost report information maintained in the Healthcare Provider Cost 
+                                           Reporting Information System (HCRIS). The data does not contain all measures reported in the HCRIS, but rather includes 
+                                           a subset of commonly used measures."""))
+    manager.register_output(OutputMarkdown("""In this example, we show how visualization can be a powerful tool when exploring data. The government provides a lot of data, 
+                                           but it can be difficult to understand and interpret. By using visualization, we can quickly see the distribution of the data. Using 
+                                           the dropdowns below, you can filter the data by hospital, number of beds, and net income. The bar chart will update to show the
+                                           filtered data. The table below the chart will show the filtered data as well. The table can be sorted by clicking on the column headers."""))
     manager.register_output(OutputMarkdown("""---"""))
-    manager.register_output(OutputChart_Matplotlib(plt))
+    manager.register_output(OutputMarkdown("""### Hospital Financial Summary Data"""))
+    manager.register_output(OutputMarkdown("""Filters Active: Hospital: **{input2_dropdown.value}** // Beds: **{input2_dropdown2.value}** // Net Income: **{input2_dropdown3.value}**""".format(input2_dropdown=input2_dropdown, input2_dropdown2=input2_dropdown2, input2_dropdown3=input2_dropdown3)))
+    manager.register_output(OutputMarkdown("""---"""))
+    manager.register_output(OutputText(f"Percent of Total Beds in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Beds'].values[0] * 100).round(2)}%"))
+    manager.register_output(OutputText(f"Percent of Total Outpatient Revenue in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Outpatient Revenue'].values[0] * 100).round(2)}%"))
+    manager.register_output(OutputText(f"Percent of Total Inpatient Revenue in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Inpatient Revenue'].values[0] * 100).round(2)}%"))
+    manager.register_output(OutputText(f"Percent of Total Medicaid Charges in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Medicaid Charges'].values[0] * 100).round(2)}%"))
+    manager.register_output(OutputText(f"Percent of Total Net Income in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Net Income'].values[0] * 100).round(2)}%"))
+    manager.register_output(OutputMarkdown("""---"""))
+    manager.register_output(OutputChart_Matplotlib(fig1))
+    manager.register_output(OutputMarkdown("""---"""))
     manager.register_output(OutputMarkdown("""### Hospital Financial Detail Data"""))
     manager.register_output(OutputTable_HTML(output_df.to_dict(orient='records')))
     manager.register_output(OutputMarkdown("""<br /> <br /> """))
