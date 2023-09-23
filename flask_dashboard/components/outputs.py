@@ -11,7 +11,7 @@ class OutputText:
 
     def render(self):
         template = '''
-        <div class="p-2 border rounded bg-white">
+        <div class="p-2 sm:p-3 md:p-4 border rounded bg-white text-base sm:text-md md:text-md">
             {{ content }}
         </div>
         '''
@@ -37,8 +37,8 @@ class OutputChart_Matplotlib:
         buf.close()
         
         template = '''
-        <div>
-            <img class="max-w-full" src="{{ image }}">
+        <div class="flex justify-center items-center">
+            <img class="max-w-full h-auto" src="{{ image }}">
         </div>
         '''
 
@@ -51,34 +51,35 @@ class OutputTable_HTML:
 
     def render(self):
         template = '''
-            <div class="mt-8 flow-root bg-white">
-                <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="mt-8 flow-root bg-white">
+            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                     <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-300">
-                        <thead>
-                            <tr>
-                            {% for header in data[0].keys() %}
-                                <th class="px-3 py-3.5 text-left text-sm font-semibold text-grey-900">{{ header }}</th>
-                            {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in data %}
+                        <table class="min-w-full divide-y divide-gray-200 border-collapse">
+                            <thead>
                                 <tr>
-                                    {% for value in row.values() %}
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{{ value }}</td>
-                                    {% endfor %}
+                                {% for header in data[0].keys() %}
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ header }}</th>
+                                {% endfor %}
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for row in data %}
+                                    <tr class="{% if loop.index is odd %}bg-gray-50{% endif %} hover:bg-gray-100">
+                                        {% for value in row.values() %}
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                </div>
             </div>
+        </div>
         '''
         return render_template_string(template, data=self.data)
+
 
 class OutputImage:
     def __init__(self, src, alt=""):
@@ -104,9 +105,9 @@ class OutputMarkdown:
         print('Checking for conversion: ', html_content)
         
         template = '''
-        <div class="markdown-body">
-            {{ content|safe }}
-        </div>
+            <div class="markdown-body text-base sm:text-lg md:text-xl px-4 sm:px-6 md:px-8">
+                {{ content|safe }}
+            </div>
         '''
         
         return render_template_string(template, content=html_content)

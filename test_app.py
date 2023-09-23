@@ -57,8 +57,10 @@ def index():
 
     ################################################################################################
     # Step 4: Register output components to be rendered
+    manager.register_output(OutputMarkdown("""*Powered by [School of Health Professions - Applied Health Informatics](https://healthprofessions.stonybrookmedicine.edu/programs/ahi) at*"""))
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
-    manager.register_output(OutputMarkdown("""# Suffolk and Nassau County Hospital Data: CMS 2019"""))
+    manager.register_output(OutputMarkdown("""---"""))
+    manager.register_output(OutputMarkdown("""# Hospital Comparison: Suffolk and Nassau County Hospital Data by CMS 2019"""))
     manager.register_output(OutputMarkdown("""The following data originates from [data.cms.gov](https://data.cms.gov/provider-compliance/cost-report/hospital-provider-cost-report),
                                            and is a subset of the data for Suffolk and Nassau County. The data is from 2019 and is the most recent data available. 
                                            This data is gathered from the hospital annual cost report information maintained in the Healthcare Provider Cost 
@@ -68,17 +70,21 @@ def index():
                                            but it can be difficult to understand and interpret. By using visualization, we can quickly see the distribution of the data. Using 
                                            the dropdowns below, you can filter the data by hospital, number of beds, and net income. The bar chart will update to show the
                                            filtered data. The table below the chart will show the filtered data as well. The table can be sorted by clicking on the column headers."""))
+    manager.register_output(OutputMarkdown("""Please be aware that this data is for 2019 (pre-covid). Since we focus on net income, it is calculated by: subtracting Total Other Expenses (G3-Line-28-Column-1) from 
+                                           Total Income (G3-Line-26-Column-1) reported on the Statement of Revenues and Expenses (Worksheet-G-3).
+                                           The complete data dictionary can be found [here](https://data.cms.gov/resources/hospital-provider-cost-report-data-dictionary)."""))
     manager.register_output(OutputMarkdown("""---"""))
     manager.register_output(OutputMarkdown("""### Hospital Financial Summary Data"""))
     manager.register_output(OutputMarkdown("""Filters Active: Hospital: **{input2_dropdown.value}** // Beds: **{input2_dropdown2.value}** // Net Income: **{input2_dropdown3.value}**""".format(input2_dropdown=input2_dropdown, input2_dropdown2=input2_dropdown2, input2_dropdown3=input2_dropdown3)))
     manager.register_output(OutputMarkdown("""---"""))
+    manager.register_output(OutputChart_Matplotlib(fig1))
+    manager.register_output(OutputMarkdown("""---"""))
     manager.register_output(OutputText(f"Percent of Total Beds in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Beds'].values[0] * 100).round(2)}%"))
+    manager.register_output(OutputText(f"Percent of Total Hospitals in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Hospitals'].values[0] * 100).round(2)}%"))
     manager.register_output(OutputText(f"Percent of Total Outpatient Revenue in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Outpatient Revenue'].values[0] * 100).round(2)}%"))
     manager.register_output(OutputText(f"Percent of Total Inpatient Revenue in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Inpatient Revenue'].values[0] * 100).round(2)}%"))
     manager.register_output(OutputText(f"Percent of Total Medicaid Charges in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Medicaid Charges'].values[0] * 100).round(2)}%"))
     manager.register_output(OutputText(f"Percent of Total Net Income in Suffolk + Nassau County: {(sum_stats_df['Percent of Total Net Income'].values[0] * 100).round(2)}%"))
-    manager.register_output(OutputMarkdown("""---"""))
-    manager.register_output(OutputChart_Matplotlib(fig1))
     manager.register_output(OutputMarkdown("""---"""))
     manager.register_output(OutputMarkdown("""### Hospital Financial Detail Data"""))
     manager.register_output(OutputTable_HTML(output_df.to_dict(orient='records')))
