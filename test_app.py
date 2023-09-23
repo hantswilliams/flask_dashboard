@@ -57,10 +57,10 @@ def index():
 
     ################################################################################################
     # Step 4: Register output components to be rendered
-    manager.register_output(OutputMarkdown("""*Powered by [School of Health Professions - Applied Health Informatics](https://healthprofessions.stonybrookmedicine.edu/programs/ahi) at*"""))
+    manager.register_output(OutputMarkdown("""*Powered by [School of Health Professions - Applied Health Informatics](https://healthprofessions.stonybrookmedicine.edu/programs/ahi)*"""))
     manager.register_output(OutputImage("https://www.stonybrook.edu/far-beyond/img/branding/logo/sbu/primary/300/stony-brook-university-logo-horizontal-300.png"))
     manager.register_output(OutputMarkdown("""---"""))
-    manager.register_output(OutputMarkdown("""# Hospital Comparison: Suffolk and Nassau County Hospital Data by CMS 2019"""))
+    manager.register_output(OutputMarkdown("""# Hospital Comparison: Suffolk and Nassau County Hospital Data reported by CMS 2019"""))
     manager.register_output(OutputMarkdown("""The following data originates from [data.cms.gov](https://data.cms.gov/provider-compliance/cost-report/hospital-provider-cost-report),
                                            and is a subset of the data for Suffolk and Nassau County. The data is from 2019 and is the most recent data available. 
                                            This data is gathered from the hospital annual cost report information maintained in the Healthcare Provider Cost 

@@ -74,8 +74,8 @@ def process_data(df, input_values):
         ax.spines['right'].set_visible(False)
         
         # Fonts and rotations for labels
-        ax.set_xticklabels(df['Hospital Name'], rotation=80, ha='right', fontsize=10)
-        ax.set_title('Hospital Net Income', fontsize=16, fontweight='bold', pad=20)
+        ax.set_xticklabels(df['Hospital Name'], rotation=70, ha='right', fontsize=10)
+        ax.set_title('Hospital Net Income in 2019', fontsize=16, fontweight='bold', pad=20)
         ax.set_xlabel('Hospital Name', fontsize=14, labelpad=15)
         ax.set_ylabel('Net Income', fontsize=14, labelpad=15)
 
